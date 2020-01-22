@@ -18,11 +18,11 @@ class Blog extends Component {
         axios.get('/posts')
             .then(response => {
                 // To grab the first 4 posts only
-                const posts = response.data.slice(0, 4);
+                const posts = response.data.slice(0, 6);
                 const updatedPosts = posts.map(post => {
                     return {
                         ...post,
-                        author: 'Max'
+                        author: 'Isaac'
                     }
                 });
                 this.setState({ posts: updatedPosts });
@@ -50,7 +50,15 @@ class Blog extends Component {
         }
 
         return (
-            <div>
+            <div className="Blog">
+                <header> 
+                    <nav>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/new-post">New Post</a></li>
+                        </ul>
+                    </nav>
+                </header>
                 <section className="Posts">
                     {posts}
                 </section>
