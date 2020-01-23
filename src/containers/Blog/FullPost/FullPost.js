@@ -9,22 +9,42 @@ class FullPost extends Component {
     }
 
     // status 200 indicates that post has been successfully processed
+    componentDidMount() {
+        this.loadData();
+    }
+
+    // Needed for post updates when props changes
     componentDidUpdate() {
-        if (this.props.id) {
-            axios.get('/posts/' + this.props.id)
+        this.loadData();
+    }
+    
+    loadData() {
+        const postId = this.props.match.params.id;
+        const query = new URLSearchParams(this.props.location.search); // parsing query paramerters
+        const fragment = this.props.location.hash // parsing fragment e.g. #start-position
+
+        if (postId) {
+            axios.get('/posts/' + postId)
                 .then(response => {
                     this.setState({ loadedPost: response.data });
                 });
         }
+
+        console.log('[FullPost.js] - Printing Search Param');
+        for (let param of query.entries()) {
+            console.log('[FullPost.js] - Param', param); // ['queryName', 'queryValue']
+        }
+
+        console.log('[FullPost.js] - Fragment', fragment);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return !this.state.loadedPost || (this.state.loadedPost && nextProps.id !== this.props.id);
+        return !this.state.loadedPost || (this.state.loadedPost && this.state.loadedPost.id !== parseInt(this.props.match.params.id));
     }
 
     // status 200 indicates that post has been successfully processed
     deletePostHandler = () => {
-        axios.delete('/posts/' + this.props.id)
+        axios.delete('/posts/' + this.props.match.params.id)
             .then(response => {
                 console.log(response);
             });
@@ -33,7 +53,7 @@ class FullPost extends Component {
     render() {
         let post = <p style={{ textAlign: 'center' }}>Please select a Post!</p>;
 
-        if (this.props.id) {
+        if (this.props.match.params.id) {
             post = <p style={{ textAlign: 'center' }}>Loading...</p>;
         }
 

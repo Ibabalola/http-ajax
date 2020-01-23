@@ -1,73 +1,57 @@
 import React, { Component } from 'react';
-// import axios from 'axios';
-import axios from '../../axios';
+import { Route, NavLink, Switch, Redirect } from 'react-router-dom'; // <Switch /> tells the react to choose the first route if matches 
+// and render only this route and to stop analysing thereafter
+// Order is important when using <Switch />
+// import NewPost from './NewPost/NewPost';
+import asyncComponent from '../../hoc/asyncComponent';
+import Posts from './Posts/Posts';
 
-import Post from '../../components/Post/Post';
-import FullPost from '../../components/FullPost/FullPost';
-import NewPost from '../../components/NewPost/NewPost';
 import './Blog.css';
+
+const AsyncNewPost = asyncComponent(() => {
+    return import('./NewPost/NewPost');
+});
 
 class Blog extends Component {
     state = {
-        posts: [],
-        selectedPostId: null,
-        error: false
+        auth: true
     }
 
-    componentDidMount () {
-        axios.get('/posts')
-            .then(response => {
-                // To grab the first 4 posts only
-                const posts = response.data.slice(0, 6);
-                const updatedPosts = posts.map(post => {
-                    return {
-                        ...post,
-                        author: 'Isaac'
-                    }
-                });
-                this.setState({ posts: updatedPosts });
-            })
-            .catch(error => {
-                this.setState({ error: true });
-            });;
-    }
-
-    postSelectedHandler = (id) => {
-        this.setState({ selectedPostId: id });
-    }
-
-    render () {
-        let posts = <p style={{ textAlign: 'center' }}>Something went wrong</p>;
-
-        if (!this.state.error) {
-            posts = this.state.posts.map(post => {
-                return <Post 
-                    key={post.id} 
-                    title={post.title} 
-                    author={post.author}
-                    clicked={() => this.postSelectedHandler(post.id)}/>
-            });
-        }
-
+    render() {
         return (
             <div className="Blog">
-                <header> 
+                <header>
                     <nav>
                         <ul>
-                            <li><a href="/">Home</a></li>
-                            <li><a href="/new-post">New Post</a></li>
+                            {/* Using <NavLink /> as opposed to <Link /> gives us the ability to style 
+                        the anchor tag with the use of added class */}
+                            <li><NavLink
+                                to="/posts/"
+                                exact
+                                activeClassName="my-active"
+                                activeStyle={{
+                                    color: '#fa923f',
+                                    textDecoration: 'underline'
+                                }}>Posts</NavLink></li>
+                            <li><NavLink to={{
+                                // pathname: this.props.match.url + '/new-post', - Use this.props.match.url for relative pathing 
+                                pathname: '/new-post',
+                                hash: '#submit',
+                                search: '?quick-submit=true'
+                            }}>New Post</NavLink></li>
                         </ul>
                     </nav>
                 </header>
-                <section className="Posts">
-                    {posts}
-                </section>
-                <section>
-                    <FullPost id={this.state.selectedPostId} />
-                </section>
-                <section>
-                    <NewPost />
-                </section>
+                {/* <Route path="/" exact render={() => <h1>Home</h1>}/>
+                <Route path="/" render={() => <h1>Home2</h1>}/> */}
+
+                <Switch>
+                    {this.state.auth ? <Route path="/new-post" component={AsyncNewPost} /> : null}
+                    <Route path="/posts" component={Posts} />
+                    <Route render={() => <div style={{ margin: 'auto', textAlign: 'center'}}><h1>Page Not Found</h1></div>} />
+                    {/* <Redirect from="/" to="/posts" /> */}
+                    {/* <Route path="/"  component={Posts} /> */}
+                </Switch>
             </div>
         );
     }
