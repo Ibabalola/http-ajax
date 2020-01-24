@@ -14,7 +14,16 @@ class NewPost extends Component {
 
     componentDidMount() {
         // If unauth => this.props.history.replace('/posts');
-        console.log('Posts', this.props);
+        console.log('[NewPosts.js]', this.props);
+
+        const query = new URLSearchParams(this.props.location.search); // parsing query paramerters
+        const fragment = this.props.location.hash // parsing fragment e.g. #start-position
+
+        for (let param of query.entries()) {
+            console.log('[NewPost.js] - Param', param); // ['queryName', 'queryValue']
+        }
+
+        console.log('[NewPost.js] - Fragment', fragment);
     }
 
     postDataHandler = () => {

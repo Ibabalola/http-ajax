@@ -20,8 +20,6 @@ class FullPost extends Component {
     
     loadData() {
         const postId = this.props.match.params.id;
-        const query = new URLSearchParams(this.props.location.search); // parsing query paramerters
-        const fragment = this.props.location.hash // parsing fragment e.g. #start-position
 
         if (postId) {
             axios.get('/posts/' + postId)
@@ -29,13 +27,6 @@ class FullPost extends Component {
                     this.setState({ loadedPost: response.data });
                 });
         }
-
-        console.log('[FullPost.js] - Printing Search Param');
-        for (let param of query.entries()) {
-            console.log('[FullPost.js] - Param', param); // ['queryName', 'queryValue']
-        }
-
-        console.log('[FullPost.js] - Fragment', fragment);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
